@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  paraphraser:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - TRANSFORMERS_CACHE=/app/cache
+    volumes:
+      - ./cache:/app/cache 
