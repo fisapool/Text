@@ -22,6 +22,202 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 - At least 16GB RAM
 - At least 20GB free disk space
 - Redis (included in Docker Compose)
+- CMake (for local installation)
+
+## System Dependencies
+
+### For Ubuntu/Debian:
+```bash
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    redis-server \
+    pkg-config \
+    libprotobuf-dev \
+    protobuf-compiler
+```
+
+### For macOS:
+```bash
+# Install Homebrew if not installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install system dependencies
+brew install cmake
+brew install redis
+brew install protobuf
+```
+
+### For Windows:
+1. Install Visual Studio Build Tools:
+   - Download Visual Studio Build Tools from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+   - During installation, select "Desktop development with C++"
+   - Make sure to include:
+     - MSVC v143 build tools
+     - Windows 10/11 SDK
+     - C++ CMake tools
+
+2. Install CMake:
+   - Download from: https://cmake.org/download/
+   - Choose the Windows x64 Installer
+   - During installation, select "Add CMake to the system PATH"
+
+3. Install Protocol Buffers:
+   - Download from: https://github.com/protocolbuffers/protobuf/releases
+   - Get the Windows zip file (e.g., `protoc-3.20.0-win64.zip`)
+   - Extract to a location (e.g., `C:\protobuf`)
+   - Add the `bin` directory to your system PATH
+
+4. Install Redis:
+   - Download from: https://github.com/microsoftarchive/redis/releases
+   - Get the Windows zip file
+   - Extract and run `redis-server.exe`
+
+5. **Install Python Dependencies**:
+   ```bash
+   # Create and activate virtual environment
+   python -m venv venv
+   venv\Scripts\activate
+
+   # Upgrade pip and install build tools
+   python -m pip install --upgrade pip
+   pip install wheel setuptools
+
+   # Install protobuf first
+   pip install protobuf==3.20.0
+
+   # Install sentencepiece
+   pip install sentencepiece==0.1.99
+
+   # Install other dependencies
+   pip install -r requirements.txt
+   ```
+
+6. **Troubleshooting Windows Issues**:
+   - If you get "Microsoft Visual C++ 14.0 or greater is required":
+     - Reinstall Visual Studio Build Tools
+     - Make sure to select "Desktop development with C++"
+   
+   - If you get "CMake not found":
+     - Verify CMake is in PATH: `cmake --version`
+     - If not, add CMake's bin directory to PATH
+   
+   - If you get "protoc not found":
+     - Verify protoc is in PATH: `protoc --version`
+     - If not, add protobuf's bin directory to PATH
+   
+   - If you get "cl.exe not found":
+     - Open "Developer Command Prompt for VS"
+     - Run your pip install commands from there
+
+7. **Alternative: Use Docker on Windows**:
+   If you're having issues with the local installation, use Docker:
+   ```bash
+   # Install Docker Desktop for Windows
+   # Then run:
+   docker-compose up -d
+   ```
+
+## Troubleshooting CMake Issues
+
+### Common CMake Errors and Solutions:
+
+1. **CMake not found**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install cmake
+   
+   # macOS
+   brew install cmake
+   ```
+
+2. **Compiler not found**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install build-essential
+   
+   # macOS
+   xcode-select --install
+   ```
+
+3. **CUDA not found**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install nvidia-cuda-toolkit
+   
+   # macOS
+   brew install cuda
+   ```
+
+4. **Python development headers not found**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install python3-dev
+   
+   # macOS
+   brew install python
+   ```
+
+5. **Sentencepiece Installation Issues**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install pkg-config libprotobuf-dev protobuf-compiler
+   
+   # macOS
+   brew install protobuf
+   
+   # Then install sentencepiece with specific version
+   pip install sentencepiece==0.1.99 protobuf==3.20.0
+   ```
+
+### Installing with CMake Dependencies:
+
+1. **Create and activate virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. **Upgrade pip and install build tools**:
+   ```bash
+   pip install --upgrade pip
+   pip install wheel setuptools
+   ```
+
+3. **Install PyTorch with CUDA support**:
+   ```bash
+   # For CUDA 11.8
+   pip install torch --index-url https://download.pytorch.org/whl/cu118
+   
+   # For CPU only
+   pip install torch --index-url https://download.pytorch.org/whl/cpu
+   ```
+
+4. **Install sentencepiece and its dependencies first**:
+   ```bash
+   pip install protobuf==3.20.0
+   pip install sentencepiece==0.1.99
+   ```
+
+5. **Install other dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Docker Alternative (No CMake Required):
+
+If you're having issues with CMake or sentencepiece installation, you can use Docker which includes all dependencies:
+
+```bash
+# Build and run with Docker
+docker-compose up -d
+```
 
 ## Hugging Face Authentication
 
@@ -463,14 +659,4 @@ curl -X POST http://localhost:8000/api/v1/paraphrase \
 
 2. If Redis connection fails:
    - Check Redis is running: `docker ps | grep redis`
-   - Verify Redis connection: `redis-cli ping`
-
-3. If the API is not accessible:
-   - Check if the service is running: `docker-compose ps`
-   - View logs: `docker-compose logs -f`
-   - Ensure ports 8000 and 9090 are not in use
-
-## Quick Start
-
-1. Clone the repository:
-```
+   - Verify Redis connection: `
