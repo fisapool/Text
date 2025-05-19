@@ -4,6 +4,7 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 
 ## Features
 
+### Core Features
 - High-quality paraphrasing using state-of-the-art language models
 - Multiple paraphrasing styles (neutral, formal, creative)
 - Batch processing support
@@ -13,6 +14,15 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 - GPU acceleration
 - Model information and statistics endpoints
 - Redis-based rate limiting
+
+### Premium Features
+- Style-specific paraphrasing (academic, business, creative, technical, formal, casual)
+- Tone adjustment and complexity control
+- Grammar checking and plagiarism detection
+- Readability optimization
+- Multiple output variants with confidence scoring
+- Advanced quality metrics (BLEU, ROUGE, semantic similarity)
+- Parameter-efficient fine-tuning with LoRA
 
 ## Prerequisites
 
@@ -24,9 +34,11 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 - Redis (included in Docker Compose)
 - CMake (for local installation)
 
-## System Dependencies
+## Installation
 
-### For Ubuntu/Debian:
+### System Dependencies
+
+#### For Ubuntu/Debian:
 ```bash
 # Install system dependencies
 sudo apt-get update
@@ -43,7 +55,7 @@ sudo apt-get install -y \
     protobuf-compiler
 ```
 
-### For macOS:
+#### For macOS:
 ```bash
 # Install Homebrew if not installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -54,609 +66,154 @@ brew install redis
 brew install protobuf
 ```
 
-### For Windows:
-1. Install Visual Studio Build Tools:
-   - Download Visual Studio Build Tools from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
-   - During installation, select "Desktop development with C++"
-   - Make sure to include:
-     - MSVC v143 build tools
-     - Windows 10/11 SDK
-     - C++ CMake tools
+### Project Setup
 
-2. Install CMake:
-   - Download from: https://cmake.org/download/
-   - Choose the Windows x64 Installer
-   - During installation, select "Add CMake to the system PATH"
-
-3. Install Protocol Buffers:
-   - Download from: https://github.com/protocolbuffers/protobuf/releases
-   - Get the Windows zip file (e.g., `protoc-3.20.0-win64.zip`)
-   - Extract to a location (e.g., `C:\protobuf`)
-   - Add the `bin` directory to your system PATH
-
-4. Install Redis:
-   - Download from: https://github.com/microsoftarchive/redis/releases
-   - Get the Windows zip file
-   - Extract and run `redis-server.exe`
-
-5. **Install Python Dependencies**:
-   ```bash
-   # Create and activate virtual environment
-   python -m venv venv
-   venv\Scripts\activate
-
-   # Upgrade pip and install build tools
-   python -m pip install --upgrade pip
-   pip install wheel setuptools
-
-   # Install protobuf first
-   pip install protobuf==3.20.0
-
-   # Install sentencepiece
-   pip install sentencepiece==0.1.99
-
-   # Install other dependencies
-   pip install -r requirements.txt
-   ```
-
-6. **Troubleshooting Windows Issues**:
-   - If you get "Microsoft Visual C++ 14.0 or greater is required":
-     - Reinstall Visual Studio Build Tools
-     - Make sure to select "Desktop development with C++"
-   
-   - If you get "CMake not found":
-     - Verify CMake is in PATH: `cmake --version`
-     - If not, add CMake's bin directory to PATH
-   
-   - If you get "protoc not found":
-     - Verify protoc is in PATH: `protoc --version`
-     - If not, add protobuf's bin directory to PATH
-   
-   - If you get "cl.exe not found":
-     - Open "Developer Command Prompt for VS"
-     - Run your pip install commands from there
-
-7. **Alternative: Use Docker on Windows**:
-   If you're having issues with the local installation, use Docker:
-   ```bash
-   # Install Docker Desktop for Windows
-   # Then run:
-   docker-compose up -d
-   ```
-
-## Troubleshooting CMake Issues
-
-### Common CMake Errors and Solutions:
-
-1. **CMake not found**:
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install cmake
-   
-   # macOS
-   brew install cmake
-   ```
-
-2. **Compiler not found**:
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install build-essential
-   
-   # macOS
-   xcode-select --install
-   ```
-
-3. **CUDA not found**:
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install nvidia-cuda-toolkit
-   
-   # macOS
-   brew install cuda
-   ```
-
-4. **Python development headers not found**:
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install python3-dev
-   
-   # macOS
-   brew install python
-   ```
-
-5. **Sentencepiece Installation Issues**:
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install pkg-config libprotobuf-dev protobuf-compiler
-   
-   # macOS
-   brew install protobuf
-   
-   # Then install sentencepiece with specific version
-   pip install sentencepiece==0.1.99 protobuf==3.20.0
-   ```
-
-### Installing with CMake Dependencies:
-
-1. **Create and activate virtual environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-2. **Upgrade pip and install build tools**:
-   ```bash
-   pip install --upgrade pip
-   pip install wheel setuptools
-   ```
-
-3. **Install PyTorch with CUDA support**:
-   ```bash
-   # For CUDA 11.8
-   pip install torch --index-url https://download.pytorch.org/whl/cu118
-   
-   # For CPU only
-   pip install torch --index-url https://download.pytorch.org/whl/cpu
-   ```
-
-4. **Install sentencepiece and its dependencies first**:
-   ```bash
-   pip install protobuf==3.20.0
-   pip install sentencepiece==0.1.99
-   ```
-
-5. **Install other dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Docker Alternative (No CMake Required):
-
-If you're having issues with CMake or sentencepiece installation, you can use Docker which includes all dependencies:
-
+1. Clone the repository:
 ```bash
-# Build and run with Docker
-docker-compose up -d
+git clone https://github.com/your-repo/ai-paraphraser.git
+cd ai-paraphraser
 ```
 
-## Hugging Face Authentication
-
-This project uses models from Hugging Face Hub that require authentication. You can authenticate using any of these methods:
-
-### Method 1: Environment Variable (Recommended)
-Add your Hugging Face token to your `.env` file:
+2. Create and activate virtual environment:
 ```bash
-HUGGING_FACE_HUB_TOKEN=your_token_here
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+.\venv\Scripts\activate   # Windows
 ```
 
-### Method 2: Python Code
-Add this to your code before loading models:
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+## Fine-Tuning Guide
+
+### Data Preparation
+
+1. Prepare your training data in CSV format with columns:
+   - `original_text`: Source text
+   - `paraphrased_text`: Target paraphrased text
+   - `style`: (Optional) Style category
+
+2. Run data preparation:
+```bash
+python app/training/prepare_data.py
+```
+
+This will:
+- Calculate semantic similarities
+- Filter low-quality pairs
+- Split into train/validation sets
+- Save processed datasets
+
+### Training Configuration
+
+The training configuration is in `app/training/config.py`:
+
 ```python
-from huggingface_hub import login
-login(token="your_token_here")
+# Key parameters:
+- num_train_epochs: 3
+- learning_rate: 2e-5
+- batch_size: 8
+- lora_r: 16
+- lora_alpha: 32
 ```
 
-### Method 3: Token File
-Create a token file at `~/.huggingface/token`:
+### Starting Fine-Tuning
+
+1. Ensure GPU is available:
 ```bash
-mkdir -p ~/.huggingface
-echo "your_token_here" > ~/.huggingface/token
+nvidia-smi
 ```
 
-### Method 4: CLI Login (Alternative)
-If you prefer using the CLI:
+2. Start training:
 ```bash
-pip install huggingface_hub
-huggingface-cli login
+python app/training/train.py
 ```
 
-### Getting Your Token
-1. Go to https://huggingface.co/settings/tokens
-2. Create a new token with read access
-3. Copy the token and use it in any of the methods above
+Training will:
+- Use LoRA for efficient fine-tuning
+- Track multiple quality metrics
+- Save best model checkpoints
+- Generate training statistics
 
-### Important Notes
-- The token is required for accessing gated models like Mistral-7B
-- Keep your token secure and never commit it to version control
-- The token is used for both downloading and using the models
-- You can use the same token across different authentication methods
+### Monitoring Training
 
-## Model Options
+The training process tracks:
+- BLEU score
+- ROUGE score
+- Semantic similarity
+- Training loss
+- Validation metrics
 
-### Public Models (No Authentication Required)
+### Using Fine-Tuned Model
 
-The project can use several public models that don't require Hugging Face authentication:
-
-1. **BART Large CNN** (`facebook/bart-large-cnn`)
-   - ✅ Pros:
-     - No authentication required
-     - Good for summarization and paraphrasing
-     - Smaller model size (400MB)
-     - Fast inference
-   - ❌ Cons:
-     - Less creative than larger models
-     - Limited context window
-
-2. **PEGASUS Large** (`google/pegasus-large`)
-   - ✅ Pros:
-     - Excellent for text generation
-     - Good at maintaining context
-     - No authentication needed
-   - ❌ Cons:
-     - Larger model size
-     - Slower inference
-
-3. **OPT-1.3B** (`facebook/opt-1.3b`)
-   - ✅ Pros:
-     - Efficient smaller model
-     - Good balance of size and quality
-     - Fast inference
-   - ❌ Cons:
-     - Less creative than larger models
-
-4. **GPT-Neo 1.3B** (`EleutherAI/gpt-neo-1.3B`)
-   - ✅ Pros:
-     - Open source GPT model
-     - Good for creative text
-     - No authentication required
-   - ❌ Cons:
-     - Larger model size
-     - Slower inference
-
-### How to Switch Models
-
-1. Edit your `.env` file:
-```bash
-# Choose one of these models
-MODEL_NAME=facebook/bart-large-cnn  # Default, no auth required
-# MODEL_NAME=google/pegasus-large
-# MODEL_NAME=facebook/opt-1.3b
-# MODEL_NAME=EleutherAI/gpt-neo-1.3B
+1. Update `.env`:
+```
+MODEL_PATH=models/premium
 ```
 
-2. Restart the service:
-```bash
-docker-compose down
-docker-compose up -d
-```
-
-### Model Comparison
-
-| Model | Size | Speed | Quality | Auth Required |
-|-------|------|-------|---------|---------------|
-| BART Large | 400MB | Fast | Good | No |
-| PEGASUS | 568MB | Medium | Very Good | No |
-| OPT-1.3B | 2.6GB | Fast | Good | No |
-| GPT-Neo | 2.6GB | Medium | Very Good | No |
-
-### Performance Tips
-
-1. **For Low Resource Systems**:
-   - Use BART Large or OPT-1.3B
-   - Disable ensemble mode
-   - Reduce batch size
-
-2. **For Better Quality**:
-   - Use PEGASUS or GPT-Neo
-   - Enable ensemble mode
-   - Increase batch size
-
-3. **For Production**:
-   - Use BART Large for reliability
-   - Enable caching
-   - Use GPU if available
-
-## Choosing Your Installation Method
-
-This project can be run in several different ways. Here's a guide to help you choose the best method for your needs:
-
-### Method Comparison
-
-1. **Docker (Recommended)**
-   - ✅ Best for: Production environments, consistent deployments
-   - ✅ Pros:
-     - Isolated environment
-     - Easy to set up
-     - Consistent across all platforms
-     - Includes all dependencies
-     - GPU support out of the box
-   - ❌ Cons:
-     - Requires Docker knowledge
-     - Slightly higher resource usage
-     - Larger initial download
-
-2. **Local Development Setup**
-   - ✅ Best for: Developers, contributors
-   - ✅ Pros:
-     - Familiar Python virtual environment
-     - Easy to modify code
-     - Good for debugging
-     - Smaller resource footprint
-   - ❌ Cons:
-     - More setup steps
-     - Platform-specific configurations
-     - Manual dependency management
-
-3. **Direct Python Installation**
-   - ✅ Best for: Simple testing, single-user setups
-   - ✅ Pros:
-     - Simplest setup
-     - No container overhead
-     - Direct system access
-   - ❌ Cons:
-     - Affects system Python
-     - Potential conflicts with other packages
-     - Manual dependency management
-     - Platform-specific issues
-
-4. **Conda Environment**
-   - ✅ Best for: Data scientists, ML researchers
-   - ✅ Pros:
-     - Excellent for ML dependencies
-     - Handles complex package requirements
-     - Good GPU support
-     - Cross-platform compatibility
-   - ❌ Cons:
-     - Larger installation size
-     - More complex environment management
-     - Steeper learning curve
-
-5. **Poetry**
-   - ✅ Best for: Modern Python development
-   - ✅ Pros:
-     - Modern dependency management
-     - Lock file for reproducible builds
-     - Clean project structure
-     - Good for team development
-   - ❌ Cons:
-     - Newer tool, less community support
-     - Additional learning curve
-     - May need additional configuration
-
-### Quick Decision Guide
-
-Choose Docker if:
-- You want the easiest setup
-- You need a production environment
-- You want consistent behavior across platforms
-- You're not familiar with Python environment management
-
-Choose Local Development if:
-- You're a developer contributing to the project
-- You need to modify the code frequently
-- You prefer working with virtual environments
-- You want to debug the application
-
-Choose Direct Python if:
-- You're just testing the application
-- You have a clean Python environment
-- You don't need isolation
-- You want the simplest possible setup
-
-Choose Conda if:
-- You're working with machine learning
-- You need specific package versions
-- You're familiar with Conda
-- You need GPU support without Docker
-
-Choose Poetry if:
-- You're building a modern Python project
-- You need reproducible builds
-- You're working in a team
-- You want clean dependency management
-
-## How to Run
-
-### Method 1: Using Docker (Recommended)
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/ai-paraphraser.git
-cd ai-paraphraser
-```
-
-2. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-3. Start the services:
+2. Restart the API service:
 ```bash
 docker-compose up -d
 ```
 
-4. Verify the services are running:
+## API Usage
+
+### Basic Paraphrasing
 ```bash
-docker-compose ps
+curl -X POST "http://localhost:8000/api/v1/paraphrase" \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "Your text here", "style": "formal"}'
 ```
 
-5. The API will be available at `http://localhost:8000`
-
-### Method 2: Local Development Setup
-
-1. Clone the repository:
+### Premium Features
 ```bash
-git clone https://github.com/yourusername/ai-paraphraser.git
-cd ai-paraphraser
+curl -X POST "http://localhost:8000/api/v1/paraphrase/premium" \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "text": "Your text here",
+       "style": "academic",
+       "tone": "formal",
+       "complexity": "high",
+       "variants": 3
+     }'
 ```
 
-2. Create and activate a virtual environment:
-```bash
-# On macOS/Linux
-python -m venv venv
-source venv/bin/activate
+## Docker Deployment
 
-# On Windows
-python -m venv venv
-venv\Scripts\activate
+1. Build and start services:
+```bash
+docker-compose up -d
 ```
 
-3. Install dependencies:
+2. Monitor logs:
 ```bash
-pip install -r requirements.txt
+docker-compose logs -f
 ```
 
-4. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+## Contributing
 
-5. Start Redis (required for rate limiting):
-```bash
-# Using Docker
-docker run -d -p 6379:6379 redis
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-# Or install Redis locally:
-# macOS: brew install redis
-# Ubuntu: sudo apt-get install redis-server
-```
+## License
 
-6. Run the development server:
-```bash
-uvicorn app.main:app --reload
-```
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-7. The API will be available at `http://localhost:8000`
+## Acknowledgments
 
-### Method 3: Direct Python Installation
-
-If you prefer not to use Docker or virtual environments, you can install the dependencies directly:
-
-1. Install system dependencies:
-```bash
-# On Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install python3-pip python3-dev redis-server
-
-# On macOS
-brew install python3 redis
-
-# On Windows
-# Download and install Python from python.org
-# Download and install Redis from https://github.com/microsoftarchive/redis/releases
-```
-
-2. Install Python dependencies:
-```bash
-pip3 install -r requirements.txt
-```
-
-3. Start Redis:
-```bash
-# On Ubuntu/Debian
-sudo service redis-server start
-
-# On macOS
-brew services start redis
-
-# On Windows
-# Start Redis server from the installed location
-```
-
-4. Run the application:
-```bash
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-### Method 4: Using Conda Environment
-
-For users who prefer Conda:
-
-1. Install Miniconda or Anaconda
-
-2. Create a new conda environment:
-```bash
-conda create -n ai-paraphraser python=3.8
-conda activate ai-paraphraser
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Start Redis (using any of the methods mentioned above)
-
-5. Run the application:
-```bash
-python -m uvicorn app.main:app --reload
-```
-
-### Method 5: Using Poetry (Alternative Package Manager)
-
-1. Install Poetry:
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-2. Initialize the project with Poetry:
-```bash
-poetry init
-```
-
-3. Install dependencies:
-```bash
-poetry install
-```
-
-4. Start Redis (using any of the methods mentioned above)
-
-5. Run the application:
-```bash
-poetry run uvicorn app.main:app --reload
-```
-
-### Important Notes for All Methods
-
-1. **GPU Requirements**:
-   - For optimal performance, ensure you have CUDA installed
-   - Verify GPU support: `nvidia-smi`
-   - Install CUDA toolkit if needed
-
-2. **Memory Requirements**:
-   - Minimum 16GB RAM recommended
-   - At least 20GB free disk space
-
-3. **Environment Variables**:
-   - Always set up your `.env` file
-   - Required variables:
-     - `API_KEY`
-     - `MODEL_NAME`
-     - `REDIS_HOST`
-     - `REDIS_PORT`
-
-4. **Performance Considerations**:
-   - Docker method provides the most consistent environment
-   - Local installation might require additional system configuration
-   - GPU acceleration works best with Docker or Conda environments
-
-### Verifying the Installation
-
-1. Test the API health endpoint:
-```bash
-curl http://localhost:8000/health
-```
-
-2. Test the paraphrase endpoint (replace `your_api_key` with your actual API key):
-```bash
-curl -X POST http://localhost:8000/api/v1/paraphrase \
-  -H "X-API-Key: your_api_key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "text": "Hello, this is a test message",
-    "style": "formal"
-  }'
-```
-
-### Troubleshooting
-
-1. If you encounter GPU-related issues:
-   - Ensure NVIDIA drivers are installed
-   - Verify CUDA installation: `nvidia-smi`
-   - Check Docker GPU support: `docker run --gpus all nvidia/cuda:11.0-base nvidia-smi`
-
-2. If Redis connection fails:
-   - Check Redis is running: `docker ps | grep redis`
-   - Verify Redis connection: `
+- BART model by Facebook AI Research
+- LoRA implementation by Microsoft
+- Sentence Transformers by UKP Lab
