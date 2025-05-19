@@ -23,6 +23,133 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 - At least 20GB free disk space
 - Redis (included in Docker Compose)
 
+## Hugging Face Authentication
+
+This project uses models from Hugging Face Hub that require authentication. You can authenticate using any of these methods:
+
+### Method 1: Environment Variable (Recommended)
+Add your Hugging Face token to your `.env` file:
+```bash
+HUGGING_FACE_HUB_TOKEN=your_token_here
+```
+
+### Method 2: Python Code
+Add this to your code before loading models:
+```python
+from huggingface_hub import login
+login(token="your_token_here")
+```
+
+### Method 3: Token File
+Create a token file at `~/.huggingface/token`:
+```bash
+mkdir -p ~/.huggingface
+echo "your_token_here" > ~/.huggingface/token
+```
+
+### Method 4: CLI Login (Alternative)
+If you prefer using the CLI:
+```bash
+pip install huggingface_hub
+huggingface-cli login
+```
+
+### Getting Your Token
+1. Go to https://huggingface.co/settings/tokens
+2. Create a new token with read access
+3. Copy the token and use it in any of the methods above
+
+### Important Notes
+- The token is required for accessing gated models like Mistral-7B
+- Keep your token secure and never commit it to version control
+- The token is used for both downloading and using the models
+- You can use the same token across different authentication methods
+
+## Model Options
+
+### Public Models (No Authentication Required)
+
+The project can use several public models that don't require Hugging Face authentication:
+
+1. **BART Large CNN** (`facebook/bart-large-cnn`)
+   - ✅ Pros:
+     - No authentication required
+     - Good for summarization and paraphrasing
+     - Smaller model size (400MB)
+     - Fast inference
+   - ❌ Cons:
+     - Less creative than larger models
+     - Limited context window
+
+2. **PEGASUS Large** (`google/pegasus-large`)
+   - ✅ Pros:
+     - Excellent for text generation
+     - Good at maintaining context
+     - No authentication needed
+   - ❌ Cons:
+     - Larger model size
+     - Slower inference
+
+3. **OPT-1.3B** (`facebook/opt-1.3b`)
+   - ✅ Pros:
+     - Efficient smaller model
+     - Good balance of size and quality
+     - Fast inference
+   - ❌ Cons:
+     - Less creative than larger models
+
+4. **GPT-Neo 1.3B** (`EleutherAI/gpt-neo-1.3B`)
+   - ✅ Pros:
+     - Open source GPT model
+     - Good for creative text
+     - No authentication required
+   - ❌ Cons:
+     - Larger model size
+     - Slower inference
+
+### How to Switch Models
+
+1. Edit your `.env` file:
+```bash
+# Choose one of these models
+MODEL_NAME=facebook/bart-large-cnn  # Default, no auth required
+# MODEL_NAME=google/pegasus-large
+# MODEL_NAME=facebook/opt-1.3b
+# MODEL_NAME=EleutherAI/gpt-neo-1.3B
+```
+
+2. Restart the service:
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+### Model Comparison
+
+| Model | Size | Speed | Quality | Auth Required |
+|-------|------|-------|---------|---------------|
+| BART Large | 400MB | Fast | Good | No |
+| PEGASUS | 568MB | Medium | Very Good | No |
+| OPT-1.3B | 2.6GB | Fast | Good | No |
+| GPT-Neo | 2.6GB | Medium | Very Good | No |
+
+### Performance Tips
+
+1. **For Low Resource Systems**:
+   - Use BART Large or OPT-1.3B
+   - Disable ensemble mode
+   - Reduce batch size
+
+2. **For Better Quality**:
+   - Use PEGASUS or GPT-Neo
+   - Enable ensemble mode
+   - Increase batch size
+
+3. **For Production**:
+   - Use BART Large for reliability
+   - Enable caching
+   - Use GPU if available
+
 ## Choosing Your Installation Method
 
 This project can be run in several different ways. Here's a guide to help you choose the best method for your needs:

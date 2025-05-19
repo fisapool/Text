@@ -20,4 +20,5 @@ protobuf==4.25.2
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 sentence-transformers==2.1.0
-scikit-learn==0.24.2 
+scikit-learn==0.24.2
+regex>=2021.8.3 
