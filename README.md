@@ -1,48 +1,158 @@
-# Paraphraser Microservice
+# AI Paraphraser API
 
-A FastAPI-based microservice for advanced paraphrasing using HuggingFace Transformers. Supports multiple languages and styles.
+A high-quality paraphrasing API powered by fine-tuned language models. This service provides a REST API for text paraphrasing with different styles and options.
 
-## Usage
+## Features
 
-### Local (Python)
+- High-quality paraphrasing using state-of-the-art language models
+- Multiple paraphrasing styles (neutral, formal, creative)
+- Batch processing support
+- Rate limiting and API key authentication
+- Prometheus metrics for monitoring
+- Docker and Kubernetes support
+- GPU acceleration
+- Model information and statistics endpoints
+- Redis-based rate limiting
+
+## Prerequisites
+
+- Docker and Docker Compose
+- NVIDIA GPU with CUDA support (recommended)
+- NVIDIA Container Toolkit installed
+- At least 16GB RAM
+- At least 20GB free disk space
+- Redis (included in Docker Compose)
+
+## Quick Start
+
+1. Clone the repository:
 ```bash
-pip install -r app/requirements.txt
-uvicorn paraphrase_service:app --host 0.0.0.0 --port 8001
+git clone https://github.com/yourusername/ai-paraphraser.git
+cd ai-paraphraser
 ```
 
-### Docker
+2. Copy the environment file and configure it:
 ```bash
-docker-compose up --build
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-### API Example
-POST /paraphrase
-```json
-{
-  "text": "Your text here.",
-  "lang": "en"
-}
+3. Start the services:
+```bash
+docker-compose up -d
 ```
 
-## Supported Languages/Models
-- English: Vamsi/T5_Paraphrase_Paws
-- French: plguillou/t5-base-fr-sum-cnndm
-- German: mrm8488/bert2bert_shared-german-finetuned-summarization
-- (Add more as needed)
+The API will be available at `http://localhost:8000`
 
-## Extending
-To add more languages or styles, update the `MODELS` dictionary in `app/paraphrase_service.py`.
+## API Usage
 
-## Node.js Integration Example
-```js
-async function callParaphrasingService(text, lang = "en") {
-  const response = await fetch('http://localhost:8001/paraphrase', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, lang }),
-  });
-  if (!response.ok) throw new Error('Paraphrasing service unavailable');
-  const data = await response.json();
-  return data.paraphrase;
-}
-``` 
+### Authentication
+
+All API requests require an API key to be included in the `X-API-Key` header.
+
+### Rate Limiting
+
+The API implements rate limiting using Redis:
+- Default: 100 requests per hour per API key
+- Configurable via environment variables
+- Rate limit information included in response headers
+
+### Endpoints
+
+#### Paraphrase Text
+
+```bash
+curl -X POST http://localhost:8000/api/v1/paraphrase \
+  -H "X-API-Key: your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "The quick brown fox jumps over the lazy dog",
+    "style": "formal",
+    "max_length": 512
+  }'
+```
+
+#### Batch Paraphrase
+
+```bash
+curl -X POST http://localhost:8000/api/v1/batch-paraphrase \
+  -H "X-API-Key: your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "text": "First text to paraphrase",
+      "style": "neutral"
+    },
+    {
+      "text": "Second text to paraphrase",
+      "style": "creative"
+    }
+  ]'
+```
+
+#### Model Information
+
+```bash
+curl -X GET http://localhost:8000/api/v1/model/info \
+  -H "X-API-Key: your_api_key"
+```
+
+#### Model Statistics
+
+```bash
+curl -X GET http://localhost:8000/api/v1/model/stats \
+  -H "X-API-Key: your_api_key"
+```
+
+### Response Headers
+
+The API includes useful headers in responses:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Remaining requests in current window
+- `X-RateLimit-Reset`: Time until rate limit resets (in seconds)
+
+## Monitoring
+
+Prometheus metrics are available at `http://localhost:9090/metrics`
+
+Key metrics:
+- `paraphrase_requests_total`: Total number of paraphrase requests by status and style
+- `paraphrase_latency_seconds`: Processing time for paraphrase requests by style
+- `tokens_processed_total`: Total number of tokens processed by operation
+
+## Development
+
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the development server:
+```bash
+uvicorn app.main:app --reload
+```
+
+## Environment Variables
+
+Key environment variables:
+- `API_KEY`: Your API key for authentication
+- `MODEL_NAME`: Name of the model to use
+- `RATE_LIMIT_REQUESTS`: Number of requests allowed per window
+- `RATE_LIMIT_WINDOW`: Time window for rate limiting in seconds
+- `REDIS_HOST`: Redis server hostname
+- `REDIS_PORT`: Redis server port
+- `ENABLE_METRICS`: Enable Prometheus metrics
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. 
