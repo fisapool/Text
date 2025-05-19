@@ -23,7 +23,9 @@ A high-quality paraphrasing API powered by fine-tuned language models. This serv
 - At least 20GB free disk space
 - Redis (included in Docker Compose)
 
-## Quick Start
+## How to Run
+
+### Method 1: Using Docker (Recommended)
 
 1. Clone the repository:
 ```bash
@@ -31,7 +33,7 @@ git clone https://github.com/yourusername/ai-paraphraser.git
 cd ai-paraphraser
 ```
 
-2. Copy the environment file and configure it:
+2. Set up environment variables:
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
@@ -42,117 +44,95 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-The API will be available at `http://localhost:8000`
+4. Verify the services are running:
+```bash
+docker-compose ps
+```
 
-## API Usage
+5. The API will be available at `http://localhost:8000`
 
-### Authentication
+### Method 2: Local Development Setup
 
-All API requests require an API key to be included in the `X-API-Key` header.
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ai-paraphraser.git
+cd ai-paraphraser
+```
 
-### Rate Limiting
+2. Create and activate a virtual environment:
+```bash
+# On macOS/Linux
+python -m venv venv
+source venv/bin/activate
 
-The API implements rate limiting using Redis:
-- Default: 100 requests per hour per API key
-- Configurable via environment variables
-- Rate limit information included in response headers
+# On Windows
+python -m venv venv
+venv\Scripts\activate
+```
 
-### Endpoints
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-#### Paraphrase Text
+4. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
+5. Start Redis (required for rate limiting):
+```bash
+# Using Docker
+docker run -d -p 6379:6379 redis
+
+# Or install Redis locally:
+# macOS: brew install redis
+# Ubuntu: sudo apt-get install redis-server
+```
+
+6. Run the development server:
+```bash
+uvicorn app.main:app --reload
+```
+
+7. The API will be available at `http://localhost:8000`
+
+### Verifying the Installation
+
+1. Test the API health endpoint:
+```bash
+curl http://localhost:8000/health
+```
+
+2. Test the paraphrase endpoint (replace `your_api_key` with your actual API key):
 ```bash
 curl -X POST http://localhost:8000/api/v1/paraphrase \
   -H "X-API-Key: your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "The quick brown fox jumps over the lazy dog",
-    "style": "formal",
-    "max_length": 512
+    "text": "Hello, this is a test message",
+    "style": "formal"
   }'
 ```
 
-#### Batch Paraphrase
+### Troubleshooting
 
-```bash
-curl -X POST http://localhost:8000/api/v1/batch-paraphrase \
-  -H "X-API-Key: your_api_key" \
-  -H "Content-Type: application/json" \
-  -d '[
-    {
-      "text": "First text to paraphrase",
-      "style": "neutral"
-    },
-    {
-      "text": "Second text to paraphrase",
-      "style": "creative"
-    }
-  ]'
+1. If you encounter GPU-related issues:
+   - Ensure NVIDIA drivers are installed
+   - Verify CUDA installation: `nvidia-smi`
+   - Check Docker GPU support: `docker run --gpus all nvidia/cuda:11.0-base nvidia-smi`
+
+2. If Redis connection fails:
+   - Check Redis is running: `docker ps | grep redis`
+   - Verify Redis connection: `redis-cli ping`
+
+3. If the API is not accessible:
+   - Check if the service is running: `docker-compose ps`
+   - View logs: `docker-compose logs -f`
+   - Ensure ports 8000 and 9090 are not in use
+
+## Quick Start
+
+1. Clone the repository:
 ```
-
-#### Model Information
-
-```bash
-curl -X GET http://localhost:8000/api/v1/model/info \
-  -H "X-API-Key: your_api_key"
-```
-
-#### Model Statistics
-
-```bash
-curl -X GET http://localhost:8000/api/v1/model/stats \
-  -H "X-API-Key: your_api_key"
-```
-
-### Response Headers
-
-The API includes useful headers in responses:
-- `X-RateLimit-Limit`: Maximum requests allowed
-- `X-RateLimit-Remaining`: Remaining requests in current window
-- `X-RateLimit-Reset`: Time until rate limit resets (in seconds)
-
-## Monitoring
-
-Prometheus metrics are available at `http://localhost:9090/metrics`
-
-Key metrics:
-- `paraphrase_requests_total`: Total number of paraphrase requests by status and style
-- `paraphrase_latency_seconds`: Processing time for paraphrase requests by style
-- `tokens_processed_total`: Total number of tokens processed by operation
-
-## Development
-
-1. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the development server:
-```bash
-uvicorn app.main:app --reload
-```
-
-## Environment Variables
-
-Key environment variables:
-- `API_KEY`: Your API key for authentication
-- `MODEL_NAME`: Name of the model to use
-- `RATE_LIMIT_REQUESTS`: Number of requests allowed per window
-- `RATE_LIMIT_WINDOW`: Time window for rate limiting in seconds
-- `REDIS_HOST`: Redis server hostname
-- `REDIS_PORT`: Redis server port
-- `ENABLE_METRICS`: Enable Prometheus metrics
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. 
